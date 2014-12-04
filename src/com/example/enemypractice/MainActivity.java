@@ -196,6 +196,17 @@ public class MainActivity extends Activity {
 						enemyArray[i].moveLeft(translation[i], cats[i]);
 					}
 					
+					for(int i = 0; i < bulletIndex; i++){
+					//	if(bulletArray[i].getY() == enemyArray[i].getY()){
+					//		System.out.print("hit!");
+					//		translation[i] += 10000;
+					//		enemyArray[i].moveLeft(translation[i], cats[i]);
+					//	}
+						
+						bulletPosition[i] += speed;
+						bulletArray[i].moveRight(bulletPosition[i], bullets[i]);
+					}
+					
 					
 					//set the image for enemy
 					img = new ImageView (MainActivity.this);
