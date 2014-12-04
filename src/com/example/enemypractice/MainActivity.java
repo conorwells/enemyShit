@@ -17,11 +17,11 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	Timer myTimer;				// create timer
-	RelativeLayout rl;        //create layout to add images to
+	RelativeLayout rl;          //create layout to add images to
 	ImageView img;  			//declare imageView
-	ImageView hero;
+	ImageView frank;
 	Button b;					//declare button
-	int xPos = 1150;           //initialize x position for enemies
+	int xPos = 1150;            //initialize x position for enemies
 	int yPos = 0;				//declare variable that will be the lane
 	int flag = 0;				//flag will decide what lane the enemies end up in
 	int randInt;				//rand integer to set lanes
@@ -31,7 +31,16 @@ public class MainActivity extends Activity {
 	ImageView[] cats;			//array of images of enemies, this makes sure that the images are moving on screen
 	Enemy dummyEnemy;			//object
 	Enemy[] enemyArray;			//array of all the enemies
+	Bullet[] bulletArray;
+	ImageView[] bullets;
+	int[] bulletPosition;
+	int bulletIndex = 0;
 	int pos = 0;
+	int x = 100;
+	int y = 300;
+	int xBull;
+	int yBull;
+	Hero hero;
 	
 
 
@@ -50,20 +59,36 @@ public class MainActivity extends Activity {
 
 		//create a timer
 		myTimer = new Timer(true);
+		rl = (RelativeLayout) findViewById(R.id.rl);
 		//myTimer.scheduleAtFixedRate(new MyTimerTask(), 5000, 1000);
 		//declare all the arrays with 100 elements
 		enemyArray = new Enemy[100];
 		translation = new int[100];
 		cats = new ImageView[100];
+		
+		bulletArray = new Bullet[100];
+		bulletPosition = new int[100];
+		bullets = new ImageView[100];
+		
+		frank = new ImageView (MainActivity.this);
+		System.out.println("Created frank");
+		
+		//create hero
+		x = 50;
+		y = 300;
+		hero = new Hero(x,y,frank,rl);
+		System.out.println("Created Hero");
+		
 		//initializes our translation array with 0's
 		for(int i = 0; i < 100; i++){
 			translation[i]=0;
 		}
 		//set up our layout and buttons
-		rl = (RelativeLayout) findViewById(R.id.rl);
-		
 		Button start = (Button)findViewById(R.id.button2);
-		Button delete = (Button)findViewById(R.id.button3);
+		Button stop = (Button)findViewById(R.id.button3);
+		Button Up = (Button)findViewById(R.id.button4);
+		Button Down = (Button)findViewById(R.id.button5);
+		Button shoot = (Button)findViewById(R.id.button6);
 		//final Enemy enemy1 = new Enemy(300,img, rl);
 		//enemyArray[0] = enemy1;
 		//message("buttons made");
@@ -78,7 +103,16 @@ public class MainActivity extends Activity {
 				myTimer.scheduleAtFixedRate(new MyTimerTask(), 500, 750);
 			}
 		});
-		Button stop = (Button)findViewById(R.id.button3);
+		
+		
+		start.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) { 		
+				myTimer.scheduleAtFixedRate(new MyTimerTask(), 500, 750);
+			}
+		});
+		
+		
 		
 		stop.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -86,41 +120,47 @@ public class MainActivity extends Activity {
 				myTimer.cancel();
 			}
 		});
-		Button Up = (Button)findViewById(R.id.button4);
+		
 		
 		Up.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) { 		
-				ImageView hero = (ImageView) findViewById(R.id.imageView1);
-				pos -=130;
-				hero.setTranslationY(pos);
+			public void onClick(View v) { 	
+				pos += 100;
+				hero.moveVertical(pos,frank);
 			}
 		});
 		
-Button Down = (Button)findViewById(R.id.button5);
 		
 		Down.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) { 		
-				ImageView hero = (ImageView) findViewById(R.id.imageView1);
-				pos +=130;
-				hero.setTranslationY(pos);
+			public void onClick(View v) { 
+				System.out.println("Created Hero");
+				pos -=100;
+				hero.moveVertical(pos,frank);
 			}
 		});
 		
-		//delete.setOnClickListener(new View.OnClickListener() {
-		//	@Override
-		//	public void onClick(View v) { 		
-		//		int speed = 10;
-				//goes through all the enemies, advances them left across the screen
-		//		for(int i = 0; i < enemyIndex; i++){
-		//			if (i == killedEnemy){
-		//				translation[i] += 10000;
-		//				enemyArray[i].moveLeft(translation[i], cats[i]);
-		//			}
-		//		}    			
-		//	}
-		//});
+		shoot.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) { 	
+				message("bullet shot");
+				//creates bullets
+				//set the image for bullet
+				img = new ImageView (MainActivity.this);
+				//Set set x, y for bullet as the same as that of the hero
+				xBull = 400;
+				yBull = 400;		
+							
+				//create bullet, update all the arrays and index
+				Bullet bullet = new Bullet(xBull,yBull,img,rl);
+				bullets[bulletIndex] = img;						//sets image for the enemy
+				//message("enemy created" );
+				bulletArray[bulletIndex] = bullet;
+				bulletIndex+=1;
+			
+				    			
+			}
+		});
 		
 	}
 
@@ -146,8 +186,14 @@ Button Down = (Button)findViewById(R.id.button5);
 					
 					// TODO Auto-generated method stub
 					for(int i = 0; i < enemyIndex; i++){
+						if(hero.getY() == enemyArray[i].getY()){
+							System.out.print("hit!");
+							translation[i] += 10000;
+							enemyArray[i].moveLeft(translation[i], cats[i]);
+						}
+						
 						translation[i] += speed;
-						enemyArray[i].moveLeft(translation[i], cats[i]);	
+						enemyArray[i].moveLeft(translation[i], cats[i]);
 					}
 					
 					
@@ -184,6 +230,8 @@ Button Down = (Button)findViewById(R.id.button5);
 					enemyArray[enemyIndex] = enemy;
 					enemyIndex+=1;
 					killedEnemy++;
+					
+					System.out.print("Frank:" + hero.getY());
 				}
 				
 			// TODO Auto-generated method stub
@@ -195,6 +243,7 @@ Button Down = (Button)findViewById(R.id.button5);
 	}
 	
 }
+
 
 
 
