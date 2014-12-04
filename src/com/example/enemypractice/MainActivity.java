@@ -18,7 +18,8 @@ public class MainActivity extends Activity {
 
 	Timer myTimer;				// create timer
 	RelativeLayout rl;        //create layout to add images to
-	ImageView img;            //declare imageView
+	ImageView img;  			//declare imageView
+	ImageView hero;
 	Button b;					//declare button
 	int xPos = 1150;           //initialize x position for enemies
 	int yPos = 0;				//declare variable that will be the lane
@@ -30,6 +31,7 @@ public class MainActivity extends Activity {
 	ImageView[] cats;			//array of images of enemies, this makes sure that the images are moving on screen
 	Enemy dummyEnemy;			//object
 	Enemy[] enemyArray;			//array of all the enemies
+	int pos = 0;
 	
 
 
@@ -48,7 +50,7 @@ public class MainActivity extends Activity {
 
 		//create a timer
 		myTimer = new Timer(true);
-		myTimer.scheduleAtFixedRate(new MyTimerTask(), 5000, 3000);
+		//myTimer.scheduleAtFixedRate(new MyTimerTask(), 5000, 1000);
 		//declare all the arrays with 100 elements
 		enemyArray = new Enemy[100];
 		translation = new int[100];
@@ -59,88 +61,66 @@ public class MainActivity extends Activity {
 		}
 		//set up our layout and buttons
 		rl = (RelativeLayout) findViewById(R.id.rl);
-		b = (Button) findViewById(R.id.button1);
-		Button left = (Button)findViewById(R.id.button2);
+		
+		Button start = (Button)findViewById(R.id.button2);
 		Button delete = (Button)findViewById(R.id.button3);
 		//final Enemy enemy1 = new Enemy(300,img, rl);
 		//enemyArray[0] = enemy1;
 		//message("buttons made");
 
 		//create a new enemy
-		b.setOnClickListener(new View.OnClickListener() {
+		
+
+
+		start.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) {
-				//set the image for enemy
-				img = new ImageView (MainActivity.this);
-				//get the random number for the lane, initialize our xPos for the enemies.
-				Random rand = new Random();
-				randInt = rand.nextInt();
-				flag = Math.abs(randInt%5);
-				message("flag is set: " + flag);
-				xPos = 1150;
-
-				//depending on the random number generated, assigns the correct lane
-				if (flag==0)
-				{
-					yPos=200;					
-				}
-				else
-					if(flag==1)
-					{
-						yPos=300;
-					}
-					else
-						if(flag==2)
-						{
-							yPos=400;
-						}
-						else
-							if(flag==3)
-							{
-								yPos=500;
-							}
-							else
-								if(flag==4)
-								{
-									yPos=600;
-
-								}
-				//create enemy, update all the arrays and index
-				Enemy enemy = new Enemy(xPos,yPos,img,rl);
-				cats[enemyIndex] = img;						//sets image for the enemy
-				message("enemy created" );
-				enemyArray[enemyIndex] = enemy;
-				enemyIndex+=1;
-				killedEnemy++;
+			public void onClick(View v) { 		
+				myTimer.scheduleAtFixedRate(new MyTimerTask(), 500, 750);
 			}
 		});
-
-
-		//left.setOnClickListener(new View.OnClickListener() {
+		Button stop = (Button)findViewById(R.id.button3);
+		
+		stop.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) { 		
+				myTimer.cancel();
+			}
+		});
+		Button Up = (Button)findViewById(R.id.button4);
+		
+		Up.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) { 		
+				ImageView hero = (ImageView) findViewById(R.id.imageView1);
+				pos -=130;
+				hero.setTranslationY(pos);
+			}
+		});
+		
+Button Down = (Button)findViewById(R.id.button5);
+		
+		Down.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) { 		
+				ImageView hero = (ImageView) findViewById(R.id.imageView1);
+				pos +=130;
+				hero.setTranslationY(pos);
+			}
+		});
+		
+		//delete.setOnClickListener(new View.OnClickListener() {
 		//	@Override
 		//	public void onClick(View v) { 		
 		//		int speed = 10;
 				//goes through all the enemies, advances them left across the screen
 		//		for(int i = 0; i < enemyIndex; i++){
-		//			translation[i] += speed;
-		//			enemyArray[i].moveLeft(translation[i], cats[i]);	
+		//			if (i == killedEnemy){
+		//				translation[i] += 10000;
+		//				enemyArray[i].moveLeft(translation[i], cats[i]);
+		//			}
 		//		}    			
 		//	}
 		//});
-		
-		delete.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) { 		
-				int speed = 10;
-				//goes through all the enemies, advances them left across the screen
-				for(int i = 0; i < enemyIndex; i++){
-					if (i == killedEnemy){
-						translation[i] += 10000;
-						enemyArray[i].moveLeft(translation[i], cats[i]);
-					}
-				}    			
-			}
-		});
 		
 	}
 
@@ -159,26 +139,63 @@ public class MainActivity extends Activity {
 			// This calls the timer on special "timer" thread
 			//goes through all the enemies, advances them left across the screen
 			runOnUiThread(new Runnable() {         //This tells the computer that when a timer event happens, update the user interface thread
-				int speed = 10;
+				int speed = 75;
 
 				@Override
 				public void run() {
+					
 					// TODO Auto-generated method stub
 					for(int i = 0; i < enemyIndex; i++){
 						translation[i] += speed;
 						enemyArray[i].moveLeft(translation[i], cats[i]);	
 					}
+					
+					
+					//set the image for enemy
+					img = new ImageView (MainActivity.this);
+					//get the random number for the lane, initialize our xPos for the enemies.
+					Random rand = new Random();
+					randInt = rand.nextInt();
+					flag = Math.abs(randInt%4);
+					//message("flag is set: " + flag);
+					xPos = 1150;
+
+					//depending on the random number generated, assigns the correct lane
+					if (flag==0)
+					{
+						yPos=200;					
+					}
+					else
+						if(flag==1)
+						{
+							yPos=300;
+						}
+						else
+							if(flag==2)
+							{
+								yPos=400;
+							}
+							
+								
+					//create enemy, update all the arrays and index
+					Enemy enemy = new Enemy(xPos,yPos,img,rl);
+					cats[enemyIndex] = img;						//sets image for the enemy
+					//message("enemy created" );
+					enemyArray[enemyIndex] = enemy;
+					enemyIndex+=1;
+					killedEnemy++;
 				}
 				
-			});
-			
-
 			// TODO Auto-generated method stub
 
-		}
+		});
 
+		}
+	
 	}
 	
 }
+
+
 
 
