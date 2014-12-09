@@ -1,5 +1,6 @@
 package com.example.enemypractice;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -16,7 +17,8 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-	Timer myTimer;				// create timer
+	Timer myTimer;	
+	Timer myTimer2;	// create timer
 	RelativeLayout rl;          //create layout to add images to
 	ImageView img;  			//declare imageView
 	ImageView frank;			//image of hero
@@ -27,13 +29,13 @@ public class MainActivity extends Activity {
 	int randInt;				//rand integer to set lanes
 	int enemyIndex = 0;			//set up index of arrays 
 	int killedEnemy = -1;
-	int[] translation;			//array of the xvalues for enemies so that they can get translated left
-	ImageView[] cats;			//array of images of enemies, this makes sure that the images are moving on screen
-	Enemy dummyEnemy;			//object
-	Enemy[] enemyArray;			//array of all the enemies
-	Bullet[] bulletArray;		
-	ImageView[] bullets;
-	int[] bulletPosition;
+	//int[] translation;			//array of the xvalues for enemies so that they can get translated left
+	//ImageView[] cats;			//array of images of enemies, this makes sure that the images are moving on screen
+	Enemy enemy;			//object
+	//Enemy[] enemyArray;			//array of all the enemies
+	//Bullet[] bulletArray;		
+	//ImageView[] bullets;
+	//int[] bulletPosition;
 	int bulletIndex = 0;
 	int pos = 0;
 	int x = 100;
@@ -41,7 +43,18 @@ public class MainActivity extends Activity {
 	int xBull;
 	int yBull;
 	Hero hero;
-	
+
+	ArrayList<Enemy> enemyArray;
+	ArrayList<Bullet> bulletArray;
+	ArrayList<Integer> translation;
+	ArrayList<Integer> bulletPos;
+	ArrayList<ImageView> cats;
+	ArrayList<ImageView> bullets;
+	ArrayList<Integer> bulhitcount;
+	ArrayList<Integer> enehitcount;
+
+
+
 
 
 	public void message(String message){
@@ -59,64 +72,71 @@ public class MainActivity extends Activity {
 
 		//create a timer
 		myTimer = new Timer(true);
+		myTimer2 = new Timer(true);
 		rl = (RelativeLayout) findViewById(R.id.rl);
-		//myTimer.scheduleAtFixedRate(new MyTimerTask(), 5000, 1000);
+		myTimer2.scheduleAtFixedRate(new MyTimerTask(), 500, 900);
 		//declare all the arrays with 100 elements
-		enemyArray = new Enemy[100];
-		translation = new int[100];
-		cats = new ImageView[100];
-		
-		
+
+		//enemyArray = new Enemy[100];
+		//translation = new int[100];
+		//cats = new ImageView[100];
+
 		//Creates everything for the bullets 
-		bulletArray = new Bullet[100];
-		bulletPosition = new int[100];
-		bullets = new ImageView[100];
-		
+		//bulletArray = new Bullet[100];
+		//bulletPosition = new int[100];
+		//bullets = new ImageView[100];
+
+		enemyArray = new ArrayList<Enemy>();
+		bulletArray = new ArrayList<Bullet>();
+		translation = new ArrayList<Integer>();
+		bulletPos = new ArrayList<Integer>();
+		cats = new ArrayList<ImageView>();
+		bullets = new ArrayList<ImageView>();
+		bulhitcount = new ArrayList<Integer>();
+		enehitcount = new ArrayList<Integer> ();
+
 		frank = new ImageView (MainActivity.this);
-		System.out.println("Created frank");
-		
+		System.out.println("Created frank");;
 		//create hero
 		x = 50;
 		y = 300;
 		hero = new Hero(x,y,frank,rl);
-		System.out.println("Created Hero");
-		
+		//System.out.println("Created Hero");
+
 		//initializes our translation array with 0's
-		for(int i = 0; i < 100; i++){
-			translation[i]=0;
-		}
+		//for(int i = 0; i < 100; i++){
+		//	translation[i]=0;
+		//}
 		//set up our layout and buttons
 		Button start = (Button)findViewById(R.id.button2);
 		Button stop = (Button)findViewById(R.id.button3);
 		Button Up = (Button)findViewById(R.id.button4);
 		Button Down = (Button)findViewById(R.id.button5);
 		Button shoot = (Button)findViewById(R.id.button6);
-		//final Enemy enemy1 = new Enemy(300,img, rl);
-		//enemyArray[0] = enemy1;
-		//message("buttons made");
 
-	
-		
 
-			//Starts all the timer activity stuff when you press the start button
+
+
+
+		//Starts all the timer activity stuff when you press the start button
 		start.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) { 		
-				myTimer.scheduleAtFixedRate(new MyTimerTask(), 500, 2000);
+				myTimer.scheduleAtFixedRate(new MyTimerTask2(), 500, 2000);
 			}
 		});
-		
-		
-		
-		
-		
+
+
+
+
+
 		stop.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) { 		
 				myTimer.cancel();
 			}
 		});
-		
+
 		//moves hero up
 		Up.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -125,7 +145,7 @@ public class MainActivity extends Activity {
 				hero.moveVertical(pos,frank);
 			}
 		});
-		
+
 		//moves hero down
 		Down.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -135,8 +155,8 @@ public class MainActivity extends Activity {
 				hero.moveVertical(pos,frank);
 			}
 		});
-		
-		
+
+
 		//shoots the bullet
 		shoot.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -148,18 +168,21 @@ public class MainActivity extends Activity {
 				//Set set x, y for bullet as the same as that of the hero
 				xBull = 400;
 				yBull = (int) frank.getY();		
-							
+
 				//create bullet, update all the arrays and index
 				Bullet bullet = new Bullet(xBull,yBull,img,rl);
-				bullets[bulletIndex] = img;						//sets image for the enemy
+				bullets.add(img);						//sets image for the enemy
 				//message("enemy created" );
-				bulletArray[bulletIndex] = bullet;
-				bulletIndex+=1;
-			
-				    			
+				bulletArray.add(bullet);
+				bulletPos.add(0);
+				System.out.println("Number of bullets " + bulletArray.size());
+				System.out.println("Number of bullets pos " + bulletPos.size());
+
+
+
 			}
 		});
-		
+		System.out.println("up to the point");
 	}
 
 
@@ -168,47 +191,34 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
-	private class MyTimerTask extends TimerTask {
 
-		int count =0;
+	private class MyTimerTask2 extends TimerTask {
 		@Override
 		public void run() {
+			System.out.print("Make it in here?");
 			// This calls the timer on special "timer" thread
 			//goes through all the enemies, advances them left across the screen
-			runOnUiThread(new Runnable() {         //This tells the computer that when a timer event happens, update the user interface thread
-				int speed = 75;
+			runOnUiThread(new Runnable() {   
+				//This tells the computer that when a timer event happens, update the user interface thread
+				Integer speed = 75;
 
 				@Override
 				public void run() {
-					
-					// TODO Auto-generated method stub
-					for(int i = 0; i < enemyIndex; i++){
-						
-						//Failed Collision detection code
-						//for(int j = 0; j < bulletIndex; i++){
-							//if(hero.getY() == enemyArray[i].getY()){
-							//	System.out.print("hit!");
-							//	translation[i] += 10000;
-							//	enemyArray[i].moveLeft(translation[i], cats[i]);
-							//	bulletPosition[j] -= 10000;
-							//	bulletArray[j].moveRight(bulletPosition[i], bullets[i]);
-						//}
-						//This if statement is an attempt at a crude collision detection 			
-						translation[i] += speed;
-						enemyArray[i].moveLeft(translation[i], cats[i]);
+
+
+					for(int i = 0; i < enemyArray.size(); i++){
+						Enemy enemy1 = enemyArray.get(i);
+						Integer dummySpeed;
+						dummySpeed = translation.get(i);
+						dummySpeed += speed;
+						//System.out.print("Moved enemy");
+						translation.set(i,dummySpeed);	
+						//System.out.print("enemy move set");
+						enemy1.moveLeft(translation.get(i), cats.get(i));
 					}
-					//This moves the bullets right
-					for(int j = 0; j < bulletIndex; j++){	
-						//Regular movement of bullets
-						bulletPosition[j] += speed;
-						bulletArray[j].moveRight(bulletPosition[j], bullets[j]);
-					}
-					//}
-					//This all creates the enemies on the timer
-					
 					//set the image for enemy
 					img = new ImageView (MainActivity.this);
+					//System.out.print("Is this making the image?");
 					//get the random number for the lane, initialize our xPos for the enemies.
 					Random rand = new Random();
 					randInt = rand.nextInt();
@@ -231,27 +241,132 @@ public class MainActivity extends Activity {
 							{
 								yPos=400;
 							}
-							
-								
+
+
 					//create enemy, update all the arrays and index
 					Enemy enemy = new Enemy(xPos,yPos,img,rl);
-					cats[enemyIndex] = img;						//sets image for the enemy
+					System.out.print("enemy created in code");
+					cats.add(img);	
+					System.out.print("enemy created on screen");//sets image for the enemy
 					//message("enemy created" );
-					enemyArray[enemyIndex] = enemy;
-					enemyIndex+=1;
-					killedEnemy++;
+					enemyArray.add(enemy);
+					translation.add(0);
 					
-					//System.out.print("Frank:" + hero.getY());
-				}
-				
-			// TODO Auto-generated method stub
+					
+					for(int j = 0; j < bulletArray.size(); j++){	
+						//Regular movement of bullets
+						Bullet bullet = bulletArray.get(j);
+						ImageView img = bullets.get(j);
+						Integer bull = bulletPos.get(j);
+						Integer dummySpeed;
+						dummySpeed = bulletPos.get(j);
+						dummySpeed += speed;
+						bulletPos.set(j, dummySpeed);
+						bulletArray.get(j).moveRight(bull, img);
+						for(int i = 0; i < enemyArray.size(); i++){
+							Enemy enemy1 = enemyArray.get(i);
+							ImageView img1 = cats.get(i);
+							Integer translations = translation.get(i);
+							if(bullet.getY() == enemy1.getY()){	
+								if(bullet.getX() >= enemy1.getX())  {
+									
+									enemyArray.remove(enemy1);
+									img1.setVisibility(View.GONE);
+									cats.remove(img1);
+									
+									translation.remove(translations);
+									bulletArray.remove(bullet);
+									bulletPos.remove(bull);
+									img.setVisibility(View.GONE);
+									bullets.remove(img);
+									
+								}
+							}
+						}
+					}
+					/*
+					for(int i = 0; i < bulhitcount.size(); i++){
+						bulletArray.remove(bulletArray.get(i));
+						bulletPos.remove(bulletPos.get(i));
+						bullets.remove(bullets.get(i));
+					}
+					for(int j = 0; j < enehitcount.size(); j++){
+						enemyArray.remove(enemyArray.get(j));
+						translation.remove(translation.get(j));
+						cats.remove(cats.get(j));
+					}
+					*/
+					
+					//for(Bullet B: bulletArray){
+					//	for(Enemy E: enemyArray){
+					//		if(B.getY() == E.getY()){
+					//			if (B.getX() >= E.getX()){
+					//				System.out.println("hit");
+					//				bulletArray.remove(B);
+					//				enemyArray.remove(E);
+					//				
+					//			}
+					//		}
+					//	}
+					//}
 
-		});
+
+					//System.out.print("Frank:" + hero.getY());
+				
+
+				// TODO Auto-generated method stub
+				}
+
+			});
 
 		}
-	
+
 	}
-	
+
+	private class MyTimerTask extends TimerTask {
+		@Override
+		public void run() {
+			System.out.print("Make it in here?");
+			// This calls the timer on special "timer" thread
+			//goes through all the enemies, advances them left across the screen
+			runOnUiThread(new Runnable() {   
+				//This tells the computer that when a timer event happens, update the user interface thread
+				Integer speed = 80;
+
+				@Override
+				public void run() {
+					//This moves the bullets right
+					/*for(int j = 0; j < bulletArray.size(); j++){	
+						//Regular movement of bullets
+						Bullet bullet1 = bulletArray.get(j);
+						Integer dummySpeed;
+						dummySpeed = bulletPos.get(j);
+						dummySpeed += speed;
+						bulletPos.set(j, dummySpeed);
+						bulletArray.get(j).moveRight(bulletPos.get(j), bullets.get(j));
+						for(int i = 0; i < enemyArray.size(); i++){
+							if(bulletArray.get(j).getY() == enemyArray.get(i).getY()){	
+								if(bulletArray.get(j).getX() >= enemyArray.get(i).getX())  {
+									//enemyArray.remove(enemyArray.get(i));
+									//cats.remove(cats.get(i));
+									//translation.remove(translation.get(i));
+									//bulletArray.remove(bulletArray.get(j));
+									//bulletPos.remove(bulletPos.get(j));
+									//bullets.remove(bullets.get(j));
+								}
+							}
+						}
+					} */
+				}
+
+				// TODO Auto-generated method stub
+
+			});
+
+		}
+
+	}
+
 }
 
 

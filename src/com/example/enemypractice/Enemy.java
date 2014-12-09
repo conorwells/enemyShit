@@ -7,15 +7,15 @@ import android.widget.RelativeLayout;
 
 public class Enemy{
 
-	private int xPos;
-	private int yPos;
+	private Integer xPos;
+	private Integer yPos;
 
 	public Enemy(){
 
 	}
 
 	//creates an enemy and creates the image of the enemy on the screen
-	public Enemy(int xPosi, int lane,ImageView img, RelativeLayout rl){
+	public Enemy(Integer xPosi, Integer lane,ImageView img, RelativeLayout rl){
 		xPos = xPosi;
 		yPos = lane;
 		img.setImageResource(R.drawable.ic_launcher);
@@ -28,7 +28,7 @@ public class Enemy{
 		// TODO Auto-generated constructor stub
 	}
 	//same as a "setY" method
-	public void setLane(int lane){
+	public void setLane(Integer lane){
 		yPos = lane;
 	}
 
@@ -37,7 +37,7 @@ public class Enemy{
 	}
 
 	//Moves our enemy across the screen
-	public void moveLeft(int speed, ImageView img){
+	public void moveLeft(Integer speed, ImageView img){
 		xPos -= speed;
 		img.setTranslationX(-speed);
 	}
