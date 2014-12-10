@@ -43,6 +43,14 @@ public class MainActivity extends Activity {
 	int xBull;
 	int yBull;
 	Hero hero;
+	int centerXOnEnemy;
+    int centerYOnEnemy;
+    int centerXOnBullet;
+    int centerYOnBullet;
+	//int centerXOnImage=myImageView.getWidth()/2;
+    //int centerYOnImage=myImageView.getHeight()/2;
+
+   
 
 	ArrayList<Enemy> enemyArray;
 	ArrayList<Bullet> bulletArray;
@@ -101,6 +109,7 @@ public class MainActivity extends Activity {
 		x = 50;
 		y = 300;
 		hero = new Hero(x,y,frank,rl);
+		
 		//System.out.println("Created Hero");
 
 		//initializes our translation array with 0's
@@ -177,6 +186,9 @@ public class MainActivity extends Activity {
 				bulletPos.add(0);
 				System.out.println("Number of bullets " + bulletArray.size());
 				System.out.println("Number of bullets pos " + bulletPos.size());
+				//sets centerX and centerY as center of the bullet
+				centerXOnBullet=img.getWidth()/2;
+			    centerYOnBullet=img.getHeight()/2;
 
 
 
@@ -208,6 +220,9 @@ public class MainActivity extends Activity {
 
 					for(int i = 0; i < enemyArray.size(); i++){
 						Enemy enemy1 = enemyArray.get(i);
+						ImageView img = cats.get(i);
+						centerXOnEnemy=img.getWidth()/2;
+						Integer translations = translation.get(i);
 						Integer dummySpeed;
 						dummySpeed = translation.get(i);
 						dummySpeed += speed;
@@ -215,6 +230,18 @@ public class MainActivity extends Activity {
 						translation.set(i,dummySpeed);	
 						//System.out.print("enemy move set");
 						enemy1.moveLeft(translation.get(i), cats.get(i));
+						int centerXOfEnemyOnScreen=img.getLeft()+centerXOnEnemy - dummySpeed;
+						
+						
+						
+						if(centerXOfEnemyOnScreen <= 200){
+					    	enemyArray.remove(enemy1);
+					    	translation.set(i, 0);
+							translation.remove(translations);
+							img.setVisibility(View.GONE);
+							cats.remove(img);
+							message("Enemy off screen");
+					    }
 					}
 					//set the image for enemy
 					img = new ImageView (MainActivity.this);
@@ -251,39 +278,10 @@ public class MainActivity extends Activity {
 					//message("enemy created" );
 					enemyArray.add(enemy);
 					translation.add(0);
+					centerXOnEnemy=img.getWidth()/2;
+				    centerYOnEnemy=img.getHeight()/2;
 					
 					
-					for(int j = 0; j < bulletArray.size(); j++){	
-						//Regular movement of bullets
-						Bullet bullet = bulletArray.get(j);
-						ImageView img = bullets.get(j);
-						Integer bull = bulletPos.get(j);
-						Integer dummySpeed;
-						dummySpeed = bulletPos.get(j);
-						dummySpeed += speed;
-						bulletPos.set(j, dummySpeed);
-						bulletArray.get(j).moveRight(bull, img);
-						for(int i = 0; i < enemyArray.size(); i++){
-							Enemy enemy1 = enemyArray.get(i);
-							ImageView img1 = cats.get(i);
-							Integer translations = translation.get(i);
-							if(bullet.getY() == enemy1.getY()){	
-								if(bullet.getX() >= enemy1.getX())  {
-									
-									enemyArray.remove(enemy1);
-									img1.setVisibility(View.GONE);
-									cats.remove(img1);
-									
-									translation.remove(translations);
-									bulletArray.remove(bullet);
-									bulletPos.remove(bull);
-									img.setVisibility(View.GONE);
-									bullets.remove(img);
-									
-								}
-							}
-						}
-					}
 					/*
 					for(int i = 0; i < bulhitcount.size(); i++){
 						bulletArray.remove(bulletArray.get(i));
@@ -326,7 +324,7 @@ public class MainActivity extends Activity {
 	private class MyTimerTask extends TimerTask {
 		@Override
 		public void run() {
-			System.out.print("Make it in here?");
+			//System.out.print("Make it in here?");
 			// This calls the timer on special "timer" thread
 			//goes through all the enemies, advances them left across the screen
 			runOnUiThread(new Runnable() {   
@@ -336,29 +334,67 @@ public class MainActivity extends Activity {
 				@Override
 				public void run() {
 					//This moves the bullets right
-					/*for(int j = 0; j < bulletArray.size(); j++){	
+					for(int j = 0; j < bulletArray.size(); j++){	
 						//Regular movement of bullets
-						Bullet bullet1 = bulletArray.get(j);
-						Integer dummySpeed;
-						dummySpeed = bulletPos.get(j);
+						Bullet bullet = bulletArray.get(j);
+						ImageView img = bullets.get(j);
+						Integer bull = bulletPos.get(j);
+						Integer dummySpeed = 0;
+						dummySpeed = bull;
+						System.out.println("dummySpeed = " + dummySpeed);
 						dummySpeed += speed;
 						bulletPos.set(j, dummySpeed);
-						bulletArray.get(j).moveRight(bulletPos.get(j), bullets.get(j));
+						dummySpeed = bulletPos.get(j);
+						bulletArray.get(j).moveRight(dummySpeed, img);
+						
+						System.out.println(img.getLeft());
+						int centerXOfBulletOnScreen=img.getLeft()+centerXOnBullet + dummySpeed;
+					    int centerYOfBulletOnScreen=img.getTop()+centerYOnBullet;	
+					    
+					    
+					    //tells if bullet if off screen
+					    if(centerXOfBulletOnScreen >= 1200){
+					    	bulletArray.remove(bullet);
+					    	bulletPos.set(j, 0);
+							bulletPos.remove(bull);
+							img.setVisibility(View.GONE);
+							bullets.remove(img);
+							message("bullet off screen");
+					    }
+					    
+					    
+					    System.out.println("number of bullets: " +  bulletArray.size() );
+						
 						for(int i = 0; i < enemyArray.size(); i++){
-							if(bulletArray.get(j).getY() == enemyArray.get(i).getY()){	
-								if(bulletArray.get(j).getX() >= enemyArray.get(i).getX())  {
-									//enemyArray.remove(enemyArray.get(i));
-									//cats.remove(cats.get(i));
-									//translation.remove(translation.get(i));
-									//bulletArray.remove(bulletArray.get(j));
-									//bulletPos.remove(bulletPos.get(j));
-									//bullets.remove(bullets.get(j));
+							Enemy enemy1 = enemyArray.get(i);
+							ImageView img1 = cats.get(i);
+							Integer translations = translation.get(i);
+							int centerXOfEnemyOnScreen=img1.getLeft()+centerXOnEnemy - translations;
+						    int centerYOfEnemyOnScreen=img1.getTop()+centerYOnEnemy;	
+						    
+							if(centerYOfBulletOnScreen == centerYOfEnemyOnScreen){	
+								System.out.println("hit");
+								//System.out.println (centerXOfBulletOnScreen + " , " + centerXOfEnemyOnScreen);
+								
+								if(centerXOfBulletOnScreen >= centerXOfEnemyOnScreen)  {
+									System.out.println("major hit");
+									enemyArray.remove(enemy1);
+									img1.setVisibility(View.GONE);
+									cats.remove(img1);	
+									translation.set(i, 0);
+									translation.remove(translations);
+									
+									
+									bulletArray.remove(bullet);
+									bulletPos.set(j, 0);
+									bulletPos.remove(bull);
+									img.setVisibility(View.GONE);
+									bullets.remove(img);
 								}
 							}
 						}
-					} */
+					}
 				}
-
 				// TODO Auto-generated method stub
 
 			});
