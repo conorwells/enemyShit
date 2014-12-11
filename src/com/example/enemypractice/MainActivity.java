@@ -236,8 +236,11 @@ public class MainActivity extends Activity {
 						
 						if(centerXOfEnemyOnScreen <= 200){
 					    	enemyArray.remove(enemy1);
-					    	translation.set(i, 0);
+				
+					    	
+					    	translation.set(i,0);
 							translation.remove(translations);
+				
 							img.setVisibility(View.GONE);
 							cats.remove(img);
 							message("Enemy off screen");
@@ -354,7 +357,7 @@ public class MainActivity extends Activity {
 					    
 					    //tells if bullet if off screen
 					    if(centerXOfBulletOnScreen >= 1200){
-					    	bulletArray.remove(bullet);
+					    	bulletArray.remove(bullet);    	
 					    	bulletPos.set(j, 0);
 							bulletPos.remove(bull);
 							img.setVisibility(View.GONE);
